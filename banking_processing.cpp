@@ -128,18 +128,41 @@ void register_user(Database &database) {
     database.users.push_back(user);
 }
 
-void write_user(User &user) {
-    
+void write_card(card &card, ofstream &write) {
+
+    write << card.type << '\n';
+    write << card.currency << '\n';
+    write << card.number << '\n';
+    write << card.cvv << '\n';
+    write << card.expire_date.day << " " << card.expire_date.month << " " << card.expire_date.year << '\n';
+    write << card.pin << '\n';
+    write << card.ballance << '\n';
+    write << card.interest_rate << '\n';
+
+}
+
+void write_account(Account &account, ofstream &write) {
+    write << account.number_of_cards << '\n';
+    write << account.iban << '\n';
+    for (auto card : account.cards) {
+        write_card(card, write);
+    }
+}
+
+void write_user(User &user, ofstream &write) {
+    write << user.name << '\n';
+    write << user.unique_serial_number << '\n';
+    write << user.birth_date.day << " " << user.birth_date.month << " " << user.birth_date.year << '\n';
+    write_account(user.account, write);
 }
 
 void update_database(Database &database) {
 
     ofstream write(DATABASE_LINK);
-
     write << database.number_of_users << '\n';
 
     for (auto user : database.users) {
-        write_user(user);
+        write_user(user, write);
     }
 
 }
@@ -152,15 +175,18 @@ int main() {
     while (true) {
 
         display_options();
-        int option;
+        string option;
         cin >> option;
-        if (option != 1 && option != 2) {
+        if (option == "exit") {
+            break;
+        }
+        if (option != "1" && option != "2") {
             cout << "Error, command unknown\n";
             continue;
         }
         else {
             cout << "You selected option number " << option << '\n';
-            if (option == 1) {
+            if (option == "1") {
                 register_user(*database);
             }
             else {
